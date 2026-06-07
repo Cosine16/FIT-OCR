@@ -24,7 +24,15 @@ classifiers = [
 ]
 
 dependencies = [
-    "pix2text>=1.1.3",
+    "pix2text>=1.1.3,<1.2",
+    # transformers/tokenizers/optimum/onnxruntime pinned for pix2text 1.1.x compatibility.
+    # transformers 5.x removes `is_tf_available` (breaks optimum 1.16);
+    # tokenizers <0.20 cannot read newer tokenizer.json formats shipped with pix2text models.
+    "transformers>=4.46,<4.50",
+    "tokenizers>=0.20,<0.21",
+    "optimum[onnxruntime]==1.16.2",
+    "onnxruntime==1.20.1",
+    "torch>=2.4,<2.7",
     "fastapi>=0.115.0",
     "uvicorn[standard]>=0.32.0",
     "python-multipart>=0.0.20",
@@ -32,7 +40,13 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-cloud = ["zhipuai>=2.1.0"]
+cloud = [
+    "zhipuai>=2.1.0",
+    # zhipuai 2.1.x has missing transitive deps in some wheels; pin them explicitly.
+    "cachetools>=4.2.2",
+    "pyjwt>=2.8.0,<2.9.0",
+    "sniffio>=1.3.0",
+]
 dev = [
     "pytest>=8.0.0",
     "pytest-asyncio>=0.24.0",
