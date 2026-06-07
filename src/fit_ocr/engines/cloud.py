@@ -4,13 +4,16 @@ from __future__ import annotations
 import base64
 import logging
 import os
+import time
 from io import BytesIO
 from pathlib import Path
 from typing import Optional
 
 from PIL import Image
 
-from engines import OCREngine
+from fit_ocr.core.interfaces import OCREngine
+from fit_ocr.core.models import OCRResult
+from fit_ocr.core.exceptions import OCRError, EngineNotAvailableError
 
 logger = logging.getLogger(__name__)
 
@@ -49,19 +52,20 @@ class CloudEngine(OCREngine):
             "如果图片中有公式，请用LaTeX格式输出。"
         )
 
-    def recognize(self, image_path: str | Path) -> str:
+    def recognize(self, image_path: str | Path) -> OCRResult:
         if not self.api_key:
-            raise RuntimeError("ZHIPUAI_API_KEY not set")
+            raise EngineNotAvailableError("ZHIPUAI_API_KEY not set")
 
         try:
             from zhipuai import ZhipuAI
         except ImportError as e:
-            raise RuntimeError("zhipuai not installed: pip install zhipuai") from e
+            raise OCRError("zhipuai not installed") from e
 
         client = ZhipuAI(api_key=self.api_key)
         b64_url = _encode_image(Path(image_path))
 
         logger.info("[cloud] calling %s for %s", self.model, Path(image_path).name)
+        t0 = time.time()
         response = client.chat.completions.create(
             model=self.model,
             messages=[
@@ -75,5 +79,11 @@ class CloudEngine(OCREngine):
             ],
         )
         text = response.choices[0].message.content
-        logger.info("[cloud] returned %d chars", len(text))
-        return text
+        elapsed = time.time() - t0
+        logger.info("[cloud] returned %d chars in %.1fs", len(text), elapsed)
+        return OCRResult(
+            text=text,
+            engine=self.name,
+            elapsed_s=elapsed,
+            image_path=Path(image_path),
+        )

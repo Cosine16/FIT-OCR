@@ -1,4 +1,4 @@
-"""Unified OCR engine interface with local/cloud fallback."""
+"""Fallback engine: try local first, fallback to cloud on failure."""
 from __future__ import annotations
 
 import logging
@@ -6,16 +6,11 @@ import time
 from pathlib import Path
 from typing import Optional
 
+from fit_ocr.core.interfaces import OCREngine
+from fit_ocr.core.models import OCRResult
+from fit_ocr.core.exceptions import OCRError
+
 logger = logging.getLogger(__name__)
-
-
-class OCREngine:
-    """Abstract base for OCR engines."""
-
-    name: str = "abstract"
-
-    def recognize(self, image_path: str | Path) -> str:
-        raise NotImplementedError
 
 
 class FallbackEngine(OCREngine):
@@ -33,7 +28,7 @@ class FallbackEngine(OCREngine):
         self.cloud = cloud
         self.timeout_s = timeout_s
 
-    def recognize(self, image_path: str | Path) -> str:
+    def recognize(self, image_path: str | Path) -> OCRResult:
         path = Path(image_path)
 
         # 1. Try local
@@ -41,13 +36,13 @@ class FallbackEngine(OCREngine):
             try:
                 logger.info("[fallback] trying local engine: %s", self.local.name)
                 t0 = time.time()
-                text = self.local.recognize(path)
+                result = self.local.recognize(path)
                 logger.info(
                     "[fallback] local ok in %.1fs (%d chars)",
-                    time.time() - t0,
-                    len(text),
+                    result.elapsed_s,
+                    len(result.text),
                 )
-                return text
+                return result
             except Exception as e:
                 logger.warning("[fallback] local failed: %s", e)
 
@@ -55,16 +50,15 @@ class FallbackEngine(OCREngine):
         if self.cloud:
             try:
                 logger.info("[fallback] trying cloud engine: %s", self.cloud.name)
-                t0 = time.time()
-                text = self.cloud.recognize(path)
+                result = self.cloud.recognize(path)
                 logger.info(
                     "[fallback] cloud ok in %.1fs (%d chars)",
-                    time.time() - t0,
-                    len(text),
+                    result.elapsed_s,
+                    len(result.text),
                 )
-                return text
+                return result
             except Exception as e:
                 logger.error("[fallback] cloud also failed: %s", e)
-                raise RuntimeError(f"Both local and cloud OCR failed: {e}") from e
+                raise OCRError(f"Both local and cloud OCR failed: {e}") from e
 
-        raise RuntimeError("No OCR engine available")
+        raise OCRError("No OCR engine available")
