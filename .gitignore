@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+
+# Prototype runtime data
+prototype/uploads/
+prototype/output/
+prototype/wheels/
+
+# Environment
+.env
