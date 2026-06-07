@@ -3,14 +3,9 @@
 #   - No tests, no error handling beyond runnability
 #   - Loud STATE prints on every action
 #   - Single file, hard-coded paths OK
-#   - Goal: prove end-to-end loop {photo upload → Pix2Text → Markdown+LaTeX → browser}
+#   - Goal: prove end-to-end loop {photo upload → OCR → Markdown+LaTeX → browser}
 #
-# Three-pane UI (per Q4 decision):
-#   left:    original image
-#   center:  KaTeX rendered output
-#   right:   raw LaTeX/Markdown source (editable)
-#
-# Crop-rerun is NOT in this prototype — that's a v2 feature once basics work.
+# Dual-engine: local (Pix2Text) first, fallback to cloud (GLM-4V) on failure.
 #
 # Run:
 #   cd prototype && source .venv/bin/activate
@@ -20,13 +15,12 @@
 #   http://100.123.57.69:8001      from phone via Tailscale
 from __future__ import annotations
 
-import io
+import os
 import time
 import uuid
 from pathlib import Path
-from typing import Optional
 
-from fastapi import FastAPI, UploadFile, File
+from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -41,20 +35,23 @@ app.mount("/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
 app.mount("/output", StaticFiles(directory=str(OUTPUT_DIR)), name="output")
 
 
-# Lazy global: load Pix2Text once on first request, keep in memory.
-# Bad pattern for prod, fine for prototype.
-_P2T = None
+# Lazy global: unified fallback engine.
+_ENGINE = None
 
 
-def _get_p2t():
-    global _P2T
-    if _P2T is None:
-        print("\n[STATE] Loading Pix2Text (first request) ...")
-        t0 = time.time()
-        from pix2text import Pix2Text
-        _P2T = Pix2Text.from_config(device="cpu", enable_table=False)
-        print(f"[STATE] Pix2Text loaded in {time.time()-t0:.1f}s")
-    return _P2T
+def _get_engine():
+    global _ENGINE
+    if _ENGINE is None:
+        print("\n[STATE] Loading OCR engines ...")
+        from engines.local import LocalEngine
+        from engines.cloud import CloudEngine
+        from engines import FallbackEngine
+
+        local = LocalEngine(device="cpu", enable_table=False)
+        cloud = CloudEngine(api_key=os.getenv("ZHIPUAI_API_KEY"))
+        _ENGINE = FallbackEngine(local=local, cloud=cloud)
+        print(f"[STATE] Fallback engine ready: {_ENGINE.name}")
+    return _ENGINE
 
 
 INDEX_HTML = """<!doctype html>
@@ -78,12 +75,18 @@ INDEX_HTML = """<!doctype html>
   button,label.btn{background:#3a7;color:#fff;padding:.5rem 1rem;border:0;border-radius:4px;cursor:pointer;font-weight:600}
   label.btn input{display:none}
   #status{color:#ff8;font-size:.9rem}
+  select{background:#333;color:#fff;border:1px solid #555;padding:.3rem .6rem;border-radius:4px}
   @media(max-width:768px){.panes{grid-template-columns:1fr;grid-template-rows:1fr 1fr 1fr;height:auto}.pane{height:60vh}}
 </style></head><body>
 <header>
   <h1>📐 FIT-OCR Prototype</h1>
   <label class="btn">📷 拍照/选图<input type="file" id="file" accept="image/*" capture="environment"></label>
   <button id="go" disabled>识别</button>
+  <select id="engine">
+    <option value="fallback">🔄 自动 (本地→云端)</option>
+    <option value="local">🏠 仅本地</option>
+    <option value="cloud">☁️ 仅云端</option>
+  </select>
   <span id="status">等待选图</span>
 </header>
 <div class="panes">
@@ -98,6 +101,7 @@ const $go   = document.getElementById('go');
 const $stat = document.getElementById('status');
 const $src  = document.getElementById('src');
 const $ren  = document.getElementById('rendered');
+const $eng  = document.getElementById('engine');
 let currentFile = null;
 
 $file.addEventListener('change', e => {
@@ -111,14 +115,17 @@ $file.addEventListener('change', e => {
 $go.addEventListener('click', async () => {
   if (!currentFile) return;
   $go.disabled = true;
-  $stat.textContent = '识别中…可能需要 5-30 秒';
-  const fd = new FormData(); fd.append('file', currentFile);
+  $stat.textContent = '识别中…';
+  const fd = new FormData();
+  fd.append('file', currentFile);
+  fd.append('engine', $eng.value);
   const t0 = performance.now();
   const r = await fetch('/recognize', {method:'POST', body:fd});
   const j = await r.json();
   const t  = ((performance.now()-t0)/1000).toFixed(1);
   if (!r.ok) { $stat.textContent = '错误: ' + (j.detail||j.error); $go.disabled = false; return; }
-  $stat.textContent = `识别完成 ${t}s · 输出 ${j.markdown.length} 字符`;
+  const engineLabel = j.engine === 'local' ? '🏠本地' : j.engine === 'cloud' ? '☁️云端' : '🔄自动';
+  $stat.textContent = `${engineLabel} · ${t}s · ${j.markdown.length} 字符`;
   $src.value = j.markdown;
   renderMarkdown(j.markdown);
   $go.disabled = false;
@@ -127,11 +134,10 @@ $go.addEventListener('click', async () => {
 $src.addEventListener('input', () => renderMarkdown($src.value));
 
 function renderMarkdown(md){
-  // very dumb markdown→html: paragraphs, line breaks, $$..$$ blocks, $..$ inline
   let html = md
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/\\n\\n+/g,'</p><p>')
-    .replace(/\\n/g,'<br>');
+    .replace(/\n\n+/g,'</p><p>')
+    .replace(/\n/g,'<br>');
   $ren.innerHTML = '<p>'+html+'</p>';
   if (window.renderMathInElement) renderMathInElement($ren, {
     delimiters:[
@@ -154,8 +160,8 @@ def index():
 
 
 @app.post("/recognize")
-async def recognize(file: UploadFile = File(...)):
-    print(f"\n[STATE] /recognize ← {file.filename} ({file.content_type})")
+async def recognize(file: UploadFile = File(...), engine: str = Form("fallback")):
+    print(f"\n[STATE] /recognize ← {file.filename} engine={engine}")
     data = await file.read()
     ext = (Path(file.filename or "img.png").suffix or ".png").lower()
     name = f"{int(time.time())}_{uuid.uuid4().hex[:6]}{ext}"
@@ -164,10 +170,24 @@ async def recognize(file: UploadFile = File(...)):
     print(f"[STATE] saved {img_path} ({len(data)} bytes)")
 
     try:
-        p2t = _get_p2t()
         t0 = time.time()
-        # Lightweight: skip layout analysis, direct OCR
-        md = p2t.recognize(str(img_path), file_type="text")
+
+        if engine == "local":
+            from engines.local import LocalEngine
+            eng = LocalEngine(device="cpu", enable_table=False)
+            md = eng.recognize(img_path)
+            used_engine = "local"
+        elif engine == "cloud":
+            from engines.cloud import CloudEngine
+            eng = CloudEngine(api_key=os.getenv("ZHIPUAI_API_KEY"))
+            md = eng.recognize(img_path)
+            used_engine = "cloud"
+        else:
+            eng = _get_engine()
+            md = eng.recognize(img_path)
+            # fallback engine reports which one succeeded internally via logs
+            used_engine = "fallback"
+
         elapsed = time.time() - t0
         out_md = OUTPUT_DIR / (img_path.stem + ".md")
         out_md.write_text(md, encoding="utf-8")
@@ -177,6 +197,7 @@ async def recognize(file: UploadFile = File(...)):
             "markdown_url": f"/output/{out_md.name}",
             "markdown": md,
             "elapsed_s": elapsed,
+            "engine": used_engine,
         })
     except Exception as e:
         import traceback
@@ -192,5 +213,5 @@ def health():
         "torch": torch.__version__,
         "cuda": torch.cuda.is_available(),
         "device": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
-        "p2t_loaded": _P2T is not None,
+        "engine_loaded": _ENGINE is not None,
     }
