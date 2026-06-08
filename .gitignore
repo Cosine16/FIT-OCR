@@ -2,12 +2,37 @@
 __pycache__/
 *.py[cod]
 *.egg-info/
-.venv/
+*.egg
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
-# Prototype runtime data
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Data (runtime)
+data/
+prototype/data/
 prototype/uploads/
 prototype/output/
 prototype/wheels/
 
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
 # Environment
 .env
+.env.local
+
+# Build
+dist/
+build/
