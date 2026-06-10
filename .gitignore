@@ -36,3 +36,28 @@ Thumbs.db
 # Build
 dist/
 build/
+
+# Android / Gradle
+.gradle/
+local.properties
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+*.jar
+!gradle-wrapper.jar
+android/.kotlin/
+android/app/build/
+android/build/
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+
+# Docs (local only)
+docs/
+
+# Keystore
+*.jks
+*.keystore
