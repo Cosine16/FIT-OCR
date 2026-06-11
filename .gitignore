@@ -20,7 +20,7 @@ prototype/output/
 prototype/wheels/
 
 # IDE
-.vscode/
+.vscode/settings.local.json
 .idea/
 *.swp
 *.swo
