@@ -1,0 +1,63 @@
+# ── FIT-OCR docker-compose ──────────────────────────────────────────────────
+# Start:   docker compose up -d
+# Logs:    docker compose logs -f fit-ocr
+# Stop:    docker compose down
+
+services:
+  # ── OCR backend ───────────────────────────────────────────────────────────
+  fit-ocr:
+    build: .
+    container_name: fit-ocr
+    restart: unless-stopped
+    ports:
+      - "${FIT_OCR_PORT:-8001}:8001"
+    volumes:
+      # Persistent data (uploads, output, database)
+      - fitocr_data:/app/data
+    environment:
+      - DEVICE=${DEVICE:-cpu}
+      - ENABLE_TABLE=${ENABLE_TABLE:-false}
+      - ZHIPUAI_API_KEY=${ZHIPUAI_API_KEY:-}
+      - CLOUD_MODEL=${CLOUD_MODEL:-glm-4v-plus}
+      - UPLOAD_DIR=/app/data/uploads
+      - OUTPUT_DIR=/app/data/output
+      - HOST=0.0.0.0
+      - PORT=8001
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 120s
+    networks:
+      - fitocr
+
+  # ── Nginx reverse proxy ───────────────────────────────────────────────────
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: fit-ocr-nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      # Shared — nginx serves uploads/output directly from the same named volume
+      - fitocr_data:/app/data:ro
+      # TLS certs (mount your own or use certbot)
+      - ${CERT_DIR:-./nginx/certs}:/etc/nginx/certs:ro
+    depends_on:
+      fit-ocr:
+        condition: service_healthy
+    networks:
+      - fitocr
+
+volumes:
+  fitocr_data:
+    driver: local
+
+networks:
+  fitocr:
+    driver: bridge

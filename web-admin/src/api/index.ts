@@ -1,5 +1,4 @@
 import axios from 'axios'
-import { useRouter } from 'vue-router'
 
 const api = axios.create({ baseURL: '/api/admin' })
 
@@ -16,8 +15,7 @@ api.interceptors.response.use(
   (err) => {
     if (err.response?.status === 401) {
       localStorage.removeItem('token')
-      const router = useRouter()
-      router.push('/login')
+      window.location.href = '/admin/#/login'
     }
     return Promise.reject(err)
   }

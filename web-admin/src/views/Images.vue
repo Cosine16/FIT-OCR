@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useMessage } from 'naive-ui'
+import { useMessage, NImage } from 'naive-ui'
 import api from '@/api'
 
 const message = useMessage()
