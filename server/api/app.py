@@ -11,9 +11,12 @@ from fastapi.staticfiles import StaticFiles
 
 from server.infrastructure.config import Config
 from server.infrastructure.logging import setup_logging
+from server.infrastructure.database import init_db, get_session
+from server.infrastructure.models import OCRRecord, RecordStatus
 from server.engines.local import LocalEngine
 from server.engines.cloud import CloudEngine
 from server.engines.fallback import FallbackEngine
+from server.api.routes.admin import router as admin_router
 
 
 def create_app(config: Config | None = None) -> FastAPI:
@@ -21,15 +24,29 @@ def create_app(config: Config | None = None) -> FastAPI:
     cfg = config or Config.from_env()
     setup_logging(cfg.log_level)
 
+    # Initialize database
+    init_db()
+
     app = FastAPI(title="FIT-OCR")
 
     # Ensure data dirs exist
     cfg.upload_dir.mkdir(parents=True, exist_ok=True)
     cfg.output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Static mounts
+    # Admin panel static mount (populated by web-admin build)
+    admin_static = Path(__file__).parent / "static" / "admin"
+    if not admin_static.exists():
+        admin_static.mkdir(parents=True, exist_ok=True)
+
+    # Static mounts — MUST be before router registration
     app.mount("/uploads", StaticFiles(directory=str(cfg.upload_dir)), name="uploads")
     app.mount("/output", StaticFiles(directory=str(cfg.output_dir)), name="output")
+
+    # Admin panel SPA (built by web-admin)
+    app.mount("/admin", StaticFiles(directory=str(admin_static), html=True), name="admin")
+
+    # Register admin API router
+    app.include_router(admin_router)
 
     # Engine registry
     _engines: dict[str, object] = {}
@@ -58,20 +75,42 @@ def create_app(config: Config | None = None) -> FastAPI:
         img_path = cfg.upload_dir / name
         img_path.write_bytes(data)
 
+        t0 = time.time()
         eng = _get_engine(engine)
-        result = eng.recognize(img_path)
+        try:
+            result = eng.recognize(img_path)
+            out_md = cfg.output_dir / (img_path.stem + ".md")
+            out_md.write_text(result.text, encoding="utf-8")
 
-        # Save markdown output
-        out_md = cfg.output_dir / (img_path.stem + ".md")
-        out_md.write_text(result.text, encoding="utf-8")
+            # Save record to DB
+            _save_record(
+                image_filename=name,
+                engine=result.engine,
+                status=RecordStatus.SUCCESS,
+                result_path=str(out_md),
+                result_preview=result.text[:500],
+                elapsed_s=result.elapsed_s,
+                image_size_bytes=len(data),
+            )
 
-        return JSONResponse({
-            "image_url": f"/uploads/{name}",
-            "markdown_url": f"/output/{out_md.name}",
-            "markdown": result.text,
-            "elapsed_s": round(result.elapsed_s, 2),
-            "engine": result.engine,
-        })
+            return JSONResponse({
+                "image_url": f"/uploads/{name}",
+                "markdown_url": f"/output/{out_md.name}",
+                "markdown": result.text,
+                "elapsed_s": round(result.elapsed_s, 2),
+                "engine": result.engine,
+            })
+        except Exception as exc:
+            elapsed = time.time() - t0
+            _save_record(
+                image_filename=name,
+                engine=engine,
+                status=RecordStatus.FAILURE,
+                elapsed_s=elapsed,
+                image_size_bytes=len(data),
+                error_msg=str(exc),
+            )
+            raise
 
     @app.get("/health")
     def health():
@@ -84,6 +123,36 @@ def create_app(config: Config | None = None) -> FastAPI:
         }
 
     return app
+
+
+def _save_record(
+    image_filename: str,
+    engine: str,
+    status: RecordStatus,
+    elapsed_s: float = 0.0,
+    result_path: str | None = None,
+    result_preview: str | None = None,
+    image_size_bytes: int = 0,
+    error_msg: str | None = None,
+):
+    """Persist an OCR call to the database."""
+    try:
+        db = get_session()
+        record = OCRRecord(
+            image_filename=image_filename,
+            engine=engine,
+            status=status,
+            result_path=result_path,
+            result_text_preview=result_preview,
+            elapsed_ms=round(elapsed_s * 1000, 1),
+            image_size_bytes=image_size_bytes,
+            error_message=error_msg,
+        )
+        db.add(record)
+        db.commit()
+    except Exception:
+        import logging
+        logging.getLogger(__name__).exception("Failed to save OCR record")
 
 
 def _load_index_html() -> str:
