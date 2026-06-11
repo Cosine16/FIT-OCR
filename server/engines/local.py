@@ -6,9 +6,9 @@ import time
 from pathlib import Path
 from typing import Optional
 
-from fit_ocr.core.interfaces import OCREngine
-from fit_ocr.core.models import OCRResult
-from fit_ocr.core.exceptions import OCRError
+from server.core.interfaces import OCREngine
+from server.core.models import OCRResult
+from server.core.exceptions import OCRError
 
 logger = logging.getLogger(__name__)
 

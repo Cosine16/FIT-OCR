@@ -1,5 +1,5 @@
 """End-to-end OCR verification on samples/synthetic_math.png."""
-from fit_ocr.engines.local import LocalEngine
+from server.engines.local import LocalEngine
 
 eng = LocalEngine(device="cpu", enable_table=False)
 r = eng.recognize("samples/synthetic_math.png")

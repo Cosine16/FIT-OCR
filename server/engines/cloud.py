@@ -11,9 +11,9 @@ from typing import Optional
 
 from PIL import Image
 
-from fit_ocr.core.interfaces import OCREngine
-from fit_ocr.core.models import OCRResult
-from fit_ocr.core.exceptions import OCRError, EngineNotAvailableError
+from server.core.interfaces import OCREngine
+from server.core.models import OCRResult
+from server.core.exceptions import OCRError, EngineNotAvailableError
 
 logger = logging.getLogger(__name__)
 

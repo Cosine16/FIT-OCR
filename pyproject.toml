@@ -55,10 +55,11 @@ dev = [
 ]
 
 [project.scripts]
-fit-ocr = "fit_ocr.__main__:main"
+fit-ocr = "server.__main__:main"
+ocr-server = "server.cli.cli:cli"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/fit_ocr"]
+packages = ["server"]
 
 [tool.ruff]
 line-length = 100

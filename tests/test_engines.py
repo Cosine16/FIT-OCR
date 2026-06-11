@@ -3,10 +3,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fit_ocr.core.models import OCRResult
-from fit_ocr.core.exceptions import EngineNotAvailableError
-from fit_ocr.engines.local import LocalEngine
-from fit_ocr.engines.cloud import CloudEngine
+from server.core.models import OCRResult
+from server.core.exceptions import EngineNotAvailableError
+from server.engines.local import LocalEngine
+from server.engines.cloud import CloudEngine
 
 
 def test_local_engine_recognizes(sample_image: Path):

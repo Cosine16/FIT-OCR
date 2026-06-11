@@ -9,11 +9,11 @@ from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from fit_ocr.infrastructure.config import Config
-from fit_ocr.infrastructure.logging import setup_logging
-from fit_ocr.engines.local import LocalEngine
-from fit_ocr.engines.cloud import CloudEngine
-from fit_ocr.engines.fallback import FallbackEngine
+from server.infrastructure.config import Config
+from server.infrastructure.logging import setup_logging
+from server.engines.local import LocalEngine
+from server.engines.cloud import CloudEngine
+from server.engines.fallback import FallbackEngine
 
 
 def create_app(config: Config | None = None) -> FastAPI:

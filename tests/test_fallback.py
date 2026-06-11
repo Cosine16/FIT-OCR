@@ -3,11 +3,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fit_ocr.core.models import OCRResult
-from fit_ocr.core.exceptions import OCRError
-from fit_ocr.engines.local import LocalEngine
-from fit_ocr.engines.cloud import CloudEngine
-from fit_ocr.engines.fallback import FallbackEngine
+from server.core.models import OCRResult
+from server.core.exceptions import OCRError
+from server.engines.local import LocalEngine
+from server.engines.cloud import CloudEngine
+from server.engines.fallback import FallbackEngine
 
 
 def test_fallback_uses_local_when_available(sample_image: Path):
