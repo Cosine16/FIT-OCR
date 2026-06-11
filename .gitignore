@@ -33,17 +33,17 @@ Thumbs.db
 .env
 .env.local
 
-# Nginx / TLS
+# Nginx / TLS certs
 nginx/certs/
 
 # Build
 dist/
 build/
-
-# Web Admin (keep built output tracked for deployment)
-web-admin/node_modules/
-web-admin/.vite/
 *.tsbuildinfo
+
+# Node / Web Admin
+node_modules/
+web-admin/.vite/
 
 # Android / Gradle
 .gradle/
@@ -69,6 +69,3 @@ docs/
 # Keystore
 *.jks
 *.keystore
-
-# nodejs module
-**/node_modules
