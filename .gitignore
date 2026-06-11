@@ -37,6 +37,11 @@ Thumbs.db
 dist/
 build/
 
+# Web Admin (keep built output tracked for deployment)
+web-admin/node_modules/
+web-admin/.vite/
+*.tsbuildinfo
+
 # Android / Gradle
 .gradle/
 local.properties
@@ -61,3 +66,6 @@ docs/
 # Keystore
 *.jks
 *.keystore
+
+# nodejs module
+**/node_modules
