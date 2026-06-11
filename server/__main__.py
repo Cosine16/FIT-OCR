@@ -1,12 +1,12 @@
-"""CLI entry point: python -m fit_ocr"""
+"""CLI entry point: python -m server"""
 import uvicorn
-from fit_ocr.infrastructure.config import Config
+from server.infrastructure.config import Config
 
 
 def main():
     cfg = Config.from_env()
     uvicorn.run(
-        "fit_ocr.web.app:create_app",
+        "server.api.app:create_app",
         factory=True,
         host=cfg.host,
         port=cfg.port,
