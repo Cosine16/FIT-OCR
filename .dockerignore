@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# VCS
+.git/
+.gitignore
+.dockerignore
+
+# Docs / samples
+docs/
+samples/
+
+# Android
+android/
+
+# Web admin sources (built output already in server/api/static/admin/)
+web-admin/
+
+# Tests
+tests/
+
+# IDE
+.vscode/
+.idea/
+
+# Env
+.env
+.env.local
+
+# Data (runtime, mounted as volumes)
+data/
+
+# Docker / compose
+docker-compose.yml
+nginx/
+
+# OS
+.DS_Store
+Thumbs.db

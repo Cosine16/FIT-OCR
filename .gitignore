@@ -33,6 +33,9 @@ Thumbs.db
 .env
 .env.local
 
+# Nginx / TLS
+nginx/certs/
+
 # Build
 dist/
 build/
