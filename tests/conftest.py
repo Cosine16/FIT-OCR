@@ -5,9 +5,9 @@ from pathlib import Path
 
 import pytest
 
-from fit_ocr.engines.local import LocalEngine
-from fit_ocr.engines.cloud import CloudEngine
-from fit_ocr.engines.fallback import FallbackEngine
+from server.engines.local import LocalEngine
+from server.engines.cloud import CloudEngine
+from server.engines.fallback import FallbackEngine
 
 
 @pytest.fixture(scope="session")

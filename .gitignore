@@ -20,7 +20,7 @@ prototype/output/
 prototype/wheels/
 
 # IDE
-.vscode/
+.vscode/settings.local.json
 .idea/
 *.swp
 *.swo
@@ -33,9 +33,22 @@ Thumbs.db
 .env
 .env.local
 
+# Nginx / TLS certs
+nginx/certs/
+
 # Build
 dist/
 build/
+*.tsbuildinfo
+
+# Node / Web Admin
+node_modules/
+web-admin/.vite/
+
+# Web Admin (keep built output tracked for deployment)
+web-admin/node_modules/
+web-admin/.vite/
+*.tsbuildinfo
 
 # Android / Gradle
 .gradle/
@@ -61,3 +74,6 @@ docs/
 # Keystore
 *.jks
 *.keystore
+
+# nodejs module
+**/node_modules

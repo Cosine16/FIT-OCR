@@ -26,8 +26,6 @@ classifiers = [
 dependencies = [
     "pix2text>=1.1.3,<1.2",
     # transformers/tokenizers/optimum/onnxruntime pinned for pix2text 1.1.x compatibility.
-    # transformers 5.x removes `is_tf_available` (breaks optimum 1.16);
-    # tokenizers <0.20 cannot read newer tokenizer.json formats shipped with pix2text models.
     "transformers>=4.46,<4.50",
     "tokenizers>=0.20,<0.21",
     "optimum[onnxruntime]==1.16.2",
@@ -37,6 +35,14 @@ dependencies = [
     "uvicorn[standard]>=0.32.0",
     "python-multipart>=0.0.20",
     "pillow>=10.0.0",
+    # CLI
+    "click>=8.0.0",
+    "rich>=13.0.0",
+    # Database & Auth
+    "sqlalchemy>=2.0.0",
+    "aiosqlite>=0.20.0",
+    "python-jose[cryptography]>=3.3.0",
+    "bcrypt>=4.0.0",
 ]
 
 [project.optional-dependencies]
@@ -55,10 +61,12 @@ dev = [
 ]
 
 [project.scripts]
-fit-ocr = "fit_ocr.__main__:main"
+fit-ocr = "server.__main__:main"
+ocr-server = "server.cli.cli:cli"
+fit-ocr-admin = "server.cli.admin_cli:admin"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/fit_ocr"]
+packages = ["server"]
 
 [tool.ruff]
 line-length = 100
