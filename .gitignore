@@ -77,3 +77,4 @@ docs/
 
 # nodejs module
 **/node_modules
+server/api/static/admin/assets/**

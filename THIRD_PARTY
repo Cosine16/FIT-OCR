@@ -1,1 +1,336 @@
+THIRD-PARTY SOFTWARE LICENSES
+=============================
+
+This document lists the third-party libraries, frameworks, and tools
+used by FIT-OCR, along with their respective open-source licenses.
+
+===============================================================================
+PYTHON — Runtime Dependencies
+===============================================================================
+
+pix2text (>=1.1.3,<1.2)
+  License: Apache License 2.0
+  URL: https://github.com/breezedeus/pix2text
+  Copyright: (c) Breezedeus
+
+transformers (>=4.46,<4.50)
+  License: Apache License 2.0
+  URL: https://github.com/huggingface/transformers
+  Copyright: (c) Hugging Face Inc.
+
+tokenizers (>=0.20,<0.21)
+  License: Apache License 2.0
+  URL: https://github.com/huggingface/tokenizers
+  Copyright: (c) Hugging Face Inc.
+
+optimum (==1.16.2)
+  License: Apache License 2.0
+  URL: https://github.com/huggingface/optimum
+  Copyright: (c) Hugging Face Inc.
+
+onnxruntime (==1.20.1)
+  License: MIT
+  URL: https://github.com/microsoft/onnxruntime
+  Copyright: (c) Microsoft Corporation
+
+torch (>=2.4,<2.7)
+  License: BSD-3-Clause
+  URL: https://github.com/pytorch/pytorch
+  Copyright: (c) Meta Platforms, Inc. and affiliates
+
+fastapi (>=0.115.0)
+  License: MIT
+  URL: https://github.com/fastapi/fastapi
+  Copyright: (c) Sebastián Ramírez
+
+uvicorn (>=0.32.0)
+  License: BSD-3-Clause
+  URL: https://github.com/encode/uvicorn
+  Copyright: (c) Encode OSS Ltd.
+
+python-multipart (>=0.0.20)
+  License: Apache License 2.0
+  URL: https://github.com/Kludex/python-multipart
+  Copyright: (c) Marcelo Trylesinski
+
+Pillow (>=10.0.0)
+  License: MIT-CMU (Historical Permission Notice and Disclaimer — HPND)
+  URL: https://github.com/python-pillow/Pillow
+  Copyright: (c) Secret Labs AB; (c) Fredrik Lundh; (c) Jeffrey A. Clark and contributors
+
+click (>=8.0.0)
+  License: BSD-3-Clause
+  URL: https://github.com/pallets/click
+  Copyright: (c) Pallets Team
+
+rich (>=13.0.0)
+  License: MIT
+  URL: https://github.com/Textualize/rich
+  Copyright: (c) Will McGugan
+
+SQLAlchemy (>=2.0.0)
+  License: MIT
+  URL: https://github.com/sqlalchemy/sqlalchemy
+  Copyright: (c) Michael Bayer
+
+aiosqlite (>=0.20.0)
+  License: MIT
+  URL: https://github.com/omnilib/aiosqlite
+  Copyright: (c) Amethyst Reese
+
+python-jose (>=3.3.0)
+  License: MIT
+  URL: https://github.com/mpdavis/python-jose
+  Copyright: (c) Michael Davis
+
+bcrypt (>=4.0.0)
+  License: Apache License 2.0
+  URL: https://github.com/pyca/bcrypt
+  Copyright: (c) The Python Cryptographic Authority
+
+===============================================================================
+PYTHON — Cloud Optional Dependencies
+===============================================================================
+
+zhipuai (>=2.1.0)
+  License: Apache License 2.0
+  URL: https://github.com/zhipuai/zhipuai-sdk-python
+  Copyright: (c) Zhipu AI
+
+cachetools (>=4.2.2)
+  License: MIT
+  URL: https://github.com/tkem/cachetools
+  Copyright: (c) Thomas Kemmer
+
+PyJWT (>=2.8.0,<2.9.0)
+  License: MIT
+  URL: https://github.com/jpadilla/pyjwt
+  Copyright: (c) José Padilla
+
+sniffio (>=1.3.0)
+  License: MIT / Apache License 2.0 (dual)
+  URL: https://github.com/python-trio/sniffio
+  Copyright: (c) Nathaniel J. Smith and contributors
+
+===============================================================================
+PYTHON — Development Dependencies
+===============================================================================
+
+pytest (>=8.0.0)
+  License: MIT
+  URL: https://github.com/pytest-dev/pytest
+  Copyright: (c) Holger Krekel and pytest-dev team
+
+pytest-asyncio (>=0.24.0)
+  License: Apache License 2.0
+  URL: https://github.com/pytest-dev/pytest-asyncio
+  Copyright: (c) pytest-dev team
+
+httpx (>=0.27.0)
+  License: BSD-3-Clause
+  URL: https://github.com/encode/httpx
+  Copyright: (c) Encode OSS Ltd.
+
+ruff (>=0.8.0)
+  License: MIT
+  URL: https://github.com/astral-sh/ruff
+  Copyright: (c) Astral Software Inc.
+
+===============================================================================
+PYTHON — Build System
+===============================================================================
+
+hatchling
+  License: MIT
+  URL: https://github.com/pypa/hatch
+  Copyright: (c) Ofek Lev and Hatch contributors
+
+===============================================================================
+JAVASCRIPT / NODE.JS — Web Admin Frontend
+===============================================================================
+
+Vue (^3.5.13)
+  License: MIT
+  URL: https://github.com/vuejs/core
+  Copyright: (c) Evan You and Vue.js contributors
+
+vue-router (^4.5.0)
+  License: MIT
+  URL: https://github.com/vuejs/router
+  Copyright: (c) Evan You and Vue.js contributors
+
+Naive UI (^2.41.0)
+  License: MIT
+  URL: https://github.com/tusen-ai/naive-ui
+  Copyright: (c) TusenAI
+
+@vicons/ionicons5 (^0.12.0)
+  License: MIT
+  URL: https://github.com/07akioni/vicons
+  Copyright: (c) 07akioni
+
+axios (^1.7.9)
+  License: MIT
+  URL: https://github.com/axios/axios
+  Copyright: (c) Matt Zabriskie and contributors
+
+dayjs (^1.11.13)
+  License: MIT
+  URL: https://github.com/iamkun/dayjs
+  Copyright: (c) iamkun
+
+@vitejs/plugin-vue (^5.2.3)
+  License: MIT
+  URL: https://github.com/vitejs/vite-plugin-vue
+  Copyright: (c) Evan You and Vite contributors
+
+vite (^6.3.0)
+  License: MIT
+  URL: https://github.com/vitejs/vite
+  Copyright: (c) Evan You and Vite contributors
+
+TypeScript (~5.7.2)
+  License: Apache License 2.0
+  URL: https://github.com/microsoft/TypeScript
+  Copyright: (c) Microsoft Corporation
+
+vue-tsc (^2.2.0)
+  License: MIT
+  URL: https://github.com/vuejs/language-tools
+  Copyright: (c) Vue.js contributors
+
+===============================================================================
+ANDROID / KOTLIN
+===============================================================================
+
+AndroidX Core KTX (1.10.1)
+  License: Apache License 2.0
+  URL: https://developer.android.com/jetpack/androidx
+  Copyright: (c) The Android Open Source Project
+
+AndroidX Lifecycle Runtime KTX (2.6.1)
+  License: Apache License 2.0
+  URL: https://developer.android.com/jetpack/androidx
+  Copyright: (c) The Android Open Source Project
+
+AndroidX Activity Compose (1.8.0)
+  License: Apache License 2.0
+  URL: https://developer.android.com/jetpack/androidx
+  Copyright: (c) The Android Open Source Project
+
+AndroidX Compose BOM (2026.02.01)
+  License: Apache License 2.0
+  URL: https://developer.android.com/jetpack/compose
+  Copyright: (c) The Android Open Source Project
+
+AndroidX Compose UI / Graphics / Tooling / Material3
+  License: Apache License 2.0
+  URL: https://developer.android.com/jetpack/compose
+  Copyright: (c) The Android Open Source Project
+
+AndroidX Navigation Compose (2.8.5)
+  License: Apache License 2.0
+  URL: https://developer.android.com/guide/navigation
+  Copyright: (c) The Android Open Source Project
+
+Retrofit (2.11.0)
+  License: Apache License 2.0
+  URL: https://github.com/square/retrofit
+  Copyright: (c) Square, Inc.
+
+OkHttp Logging Interceptor (4.12.0)
+  License: Apache License 2.0
+  URL: https://github.com/square/okhttp
+  Copyright: (c) Square, Inc.
+
+Gson (2.10.1)
+  License: Apache License 2.0
+  URL: https://github.com/google/gson
+  Copyright: (c) Google LLC
+
+Coil Compose (2.7.0)
+  License: Apache License 2.0
+  URL: https://github.com/coil-kt/coil
+  Copyright: (c) Coil contributors
+
+Kotlinx Coroutines Android (1.8.1)
+  License: Apache License 2.0
+  URL: https://github.com/Kotlin/kotlinx.coroutines
+  Copyright: (c) JetBrains s.r.o.
+
+Hilt / Dagger (2.59.2)
+  License: Apache License 2.0
+  URL: https://github.com/google/dagger
+  Copyright: (c) The Dagger Authors
+
+JUnit (4.13.2)
+  License: Eclipse Public License 2.0
+  URL: https://github.com/junit-team/junit4
+  Copyright: (c) JUnit Team
+
+AndroidX Test JUnit / Espresso
+  License: Apache License 2.0
+  URL: https://developer.android.com/training/testing
+  Copyright: (c) The Android Open Source Project
+
+Android Gradle Plugin (9.1.1)
+  License: Apache License 2.0
+  URL: https://developer.android.com/build
+  Copyright: (c) Google LLC
+
+Kotlin / Kotlin Compose Plugin (2.2.10)
+  License: Apache License 2.0
+  URL: https://github.com/JetBrains/kotlin
+  Copyright: (c) JetBrains s.r.o.
+
+KSP — Kotlin Symbol Processing (2.2.10-2.0.2)
+  License: Apache License 2.0
+  URL: https://github.com/google/ksp
+  Copyright: (c) Google LLC
+
+===============================================================================
+INFRASTRUCTURE / CONTAINER IMAGES
+===============================================================================
+
+python:3.12-slim (Docker base image)
+  License: Various — Python itself is PSF License; Debian packages carry
+           their own licenses (GPL, LGPL, BSD, MIT, Apache and others).
+           See /usr/share/doc/*/copyright inside the image for full details.
+  URL: https://hub.docker.com/_/python
+  Copyright: (c) Python Software Foundation and respective package authors
+
+nginx:1.27-alpine (Docker image)
+  License: 2-Clause BSD (nginx); MIT (Alpine Linux packages)
+  URL: https://hub.docker.com/_/nginx
+  Copyright: (c) Nginx, Inc.; (c) Alpine Linux Development Team
+
+===============================================================================
+ONNX MODELS (downloaded at runtime by pix2text)
+===============================================================================
+
+pix2text-mfd (formula detection, ONNX)
+  License: Apache License 2.0
+  URL: https://huggingface.co/breezedeus/pix2text-mfd
+  Copyright: (c) Breezedeus
+
+pix2text-mfr (formula recognition, ONNX)
+  License: Apache License 2.0
+  URL: https://huggingface.co/breezedeus/pix2text-mfr
+  Copyright: (c) Breezedeus
+
+pix2text-layout / DocLayout-YOLO
+  License: Apache License 2.0
+  URL: https://huggingface.co/breezedeus/pix2text-layout
+  Copyright: (c) Breezedeus
+
+===============================================================================
+
+Full license texts:
+  MIT:               https://opensource.org/licenses/MIT
+  Apache 2.0:        https://www.apache.org/licenses/LICENSE-2.0
+  BSD-3-Clause:      https://opensource.org/licenses/BSD-3-Clause
+  BSD-2-Clause:      https://opensource.org/licenses/BSD-2-Clause
+  EPL 2.0:           https://www.eclipse.org/legal/epl-2.0/
+  PSF:               https://docs.python.org/3/license.html
+  HPND (MIT-CMU):    https://opensource.org/licenses/HPND
 
