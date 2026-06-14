@@ -22,9 +22,9 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // 后端地址配置：支持通过 -POCR_BASE_URL 参数指定，默认使用 Tailscale 地址
-        val baseUrl = project.findProperty("OCR_BASE_URL") as String? ?: "http://100.123.57.69:8000/"
-        buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
+        // 后端地址配置：支持通过 -POCR_BASE_URL 参数指定，默认使用本地地址
+       val baseUrl = project.findProperty("OCR_BASE_URL") as String? ?: "http://192.168.31.205:8001/"
+       buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
     }
 
     buildTypes {

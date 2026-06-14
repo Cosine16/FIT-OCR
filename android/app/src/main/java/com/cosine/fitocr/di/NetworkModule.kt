@@ -2,6 +2,7 @@ package com.cosine.fitocr.di
 
 import com.cosine.fitocr.BuildConfig
 import com.cosine.fitocr.data.api.FitOcrApi
+import com.cosine.fitocr.data.network.DynamicBaseUrlInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,16 +20,19 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideOkHttpClient(): OkHttpClient {
+    fun provideOkHttpClient(
+        dynamicBaseUrlInterceptor: DynamicBaseUrlInterceptor
+    ): OkHttpClient {
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
         return OkHttpClient.Builder()
+            .addInterceptor(dynamicBaseUrlInterceptor)  // 动态替换 baseUrl
             .addInterceptor(loggingInterceptor)
-            .connectTimeout(60, TimeUnit.SECONDS)
-            .readTimeout(120, TimeUnit.SECONDS)
-            .writeTimeout(60, TimeUnit.SECONDS)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(300, TimeUnit.SECONDS)  // 首次请求需加载模型，给 5 分钟
+            .writeTimeout(120, TimeUnit.SECONDS)  // 上传图片可能较大
             .build()
     }
 
@@ -36,7 +40,7 @@ object NetworkModule {
     @Singleton
     fun provideRetrofit(client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(BuildConfig.BASE_URL)
+            .baseUrl(BuildConfig.BASE_URL) // 替换为实际服务器地址
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

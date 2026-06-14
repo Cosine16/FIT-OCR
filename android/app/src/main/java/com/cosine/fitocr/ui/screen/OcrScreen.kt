@@ -29,6 +29,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -38,6 +39,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -63,6 +65,7 @@ import com.cosine.fitocr.domain.model.OcrUiState
 import com.cosine.fitocr.ui.component.EngineSelector
 import com.cosine.fitocr.ui.component.ImagePicker
 import com.cosine.fitocr.ui.component.OcrResultView
+import com.cosine.fitocr.ui.component.SettingsDialog
 import com.cosine.fitocr.ui.viewmodel.OcrViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,6 +77,7 @@ fun OcrScreen(
     val uiState by viewModel.uiState.collectAsState()
     var selectedImageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     var selectedEngine by rememberSaveable { mutableStateOf(OcrEngine.FALLBACK) }
+    var showSettingsDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -84,6 +88,15 @@ fun OcrScreen(
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold
                     )
+                },
+                actions = {
+                    IconButton(onClick = { showSettingsDialog = true }) {
+                        Icon(
+                            imageVector = Icons.Filled.Settings,
+                            contentDescription = "设置",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
@@ -178,6 +191,13 @@ fun OcrScreen(
                     Spacer(modifier = Modifier.height(32.dp))
                 }
             }
+        }
+
+        // 设置对话框
+        if (showSettingsDialog) {
+            SettingsDialog(
+                onDismiss = { showSettingsDialog = false }
+            )
         }
     }
 }
@@ -304,6 +324,13 @@ private fun LoadingIndicator(modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 fontWeight = FontWeight.Medium
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "首次识别需加载模型，请耐心等待",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f),
+                textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(8.dp))
             LinearProgressIndicator(
